@@ -1,9 +1,4 @@
-// const express = require('express');
-// const expressGraphQL = require('express-graphql');
-// const { GraphQLSchema, GraphQLObjectType, GraphQLString } = require('graphql');
-// const app = express();
-
-const { ApolloServer, gpl } = require('apollo-server-express');
+const { ApolloServer, gql } = require('apollo-server-express');
 const express = require('express');
 
 const db = require('./src/data/knexConfig');
@@ -20,7 +15,19 @@ const typeDefs = gql`
 		email: String!
 		admin: Boolean!
 	}
+
+	type Query {
+		users: [User]!
+	}
 `;
+
+const resolvers = {
+	Query: {
+		users() {
+			return db('users');
+		}
+	}
+};
 
 const server = new ApolloServer({
 	typeDefs,
@@ -29,25 +36,4 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app });
 
-app.listen(port, () => console.log(`Server is running on http://localhost:${port}`));
-
-// const schema = new GraphQLSchema({
-// 	query: new GraphQLObjectType({
-// 		name: 'HelloWorld',
-// 		fields: () => ({
-// 			message: {
-// 				type: GraphQLString,
-// 				resolve: () => 'Hello World'
-// 			}
-// 		})
-// 	})
-// });
-
-// app.use(
-// 	'/graphql',
-// 	expressGraphQL({
-// 		schema: schema,
-// 		graphiql: true
-// 	})
-// );
-// app.listen(5000, () => console.log('Server Running'));
+app.listen(port, () => console.log(`Server is running on http://localhost:${port}/graphql`));
